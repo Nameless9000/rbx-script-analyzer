@@ -3,10 +3,10 @@
 
 if not syn then print("Exploit not supported") return end
 
-local write = function(a) rconsoleprint("@@WHITE@@") rconsoleprint(a) end
-local writei = function(a) rconsoleprint("@@BLUE@@") rconsoleprint("[*]"..a) end
-local writew = function(a) rconsoleprint("@@YELLOW@@") rconsoleprint("[*]"..table.concat(a).."\n") end
-local writee = function(a) rconsoleprint("@@RED@@") rconsoleprint(a) end
+local write = function(...)local ar={...} rconsoleprint("@@WHITE@@") rconsoleprint(table.concat(ar)) end
+local writei = function(...)local ar={...} rconsoleprint("@@BLUE@@") rconsoleprint("[*]"..table.concat(ar)) end
+local writew = function(...)local ar={...} rconsoleprint("@@YELLOW@@") rconsoleprint("[*]"..table.concat(ar).."\n") end
+local writee = function(...)local ar={...} rconsoleprint("@@RED@@") rconsoleprint(table.concat(ar)) end
 
 rconsolename("Script Analyzer")
 
