@@ -215,6 +215,17 @@ setmetatable(_G, {
     end
 })
 
+-- getgenv Spy
+
+setmetatable(getgenv(), {
+    __index = function(t, k)
+        if analyzers.GTSpy then writew("GT Spy - Invalid Index") write("Attempt to index "..k.." with a nil value inside _G\n\n") end return;
+    end,
+    __newindex = function(t, i, v) 
+        if analyzers.GTSpy then writew("GT Spy - New Index") write("New index was declared with the name of "..tostring(i).." and value of "..tostring(v).."\n\n") end rawset(t, i, v)
+    end
+})
+
 -- Remote Spy
 -- Decided to use hookfunction instead of the namecall metatable above
 
