@@ -69,6 +69,7 @@ local analyzers = {
     Namecalls = false,
     Indexes = false,
     GTSpy = false,
+    GGSpy = false,
     SynSpy = false,
     DisableHttpReq = false,
     DisableWebhookReq = false
@@ -85,7 +86,9 @@ addcmd({"commands", "cmds"}, function(args)
  namecall - Logs all namecalls that are invoked by the script.
  index - Logs all indexes that are invoked by the script.
  _gtable - Logs all changes made to the _G table.
+ getgenb - Logs all changes made to getgenv.
  syntable - Logs all changes made to the syn table.
+ all - Sets the value of all analysers
     ]])
 end)
 
@@ -124,9 +127,25 @@ addcmd({"_gtable"}, function(args)
     write("Set _G table analyzer to "..tostring(analyzers.GTSpy).."\n\n")
 end)
 
+addcmd({"getgenv"}, function(args)
+    if args[1] == "true" then analyzers.GGSpy = true else analyzers.GGSpy = false end
+    write("Set getgenv analyzer to "..tostring(analyzers.GGSpy).."\n\n")
+end)
+
 addcmd({"syntable"}, function(args)
     if args[1] == "true" then analyzers.SynSpy = true else analyzers.SynSpy = false end
     write("Set syn table analyzer to "..tostring(analyzers.SynSpy).."\n\n")
+end)
+
+addcmd({"all"}, function(args)
+    for Name,_ in pairs(analyzers) do
+        if args[1] == "true" then
+            analyzers[Name] = true
+        else
+            analyzers[Name] = false
+        end
+        write("Set syn table analyzer to "..tostring(Name).."\n\n")
+    end
 end)
 
 -------------------------------------------------------
@@ -219,10 +238,10 @@ setmetatable(_G, {
 
 setmetatable(getgenv(), {
     __index = function(t, k)
-        if analyzers.GTSpy then writew("GT Spy - Invalid Index") write("Attempt to index "..k.." with a nil value inside _G\n\n") end return;
+        if analyzers.GGSpy then writew("GG Spy - Invalid Index") write("Attempt to index "..k.." with a nil value inside getgenv\n\n") end return;
     end,
     __newindex = function(t, i, v) 
-        if analyzers.GTSpy then writew("GT Spy - New Index") write("New index was declared with the name of "..tostring(i).." and value of "..tostring(v).."\n\n") end rawset(t, i, v)
+        if analyzers.GGSpy then writew("GG Spy - New Index") write("New index was declared with the name of "..tostring(i).." and value of "..tostring(v).."\n\n") end rawset(t, i, v)
     end
 })
 
