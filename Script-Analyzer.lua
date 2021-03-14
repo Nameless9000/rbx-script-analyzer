@@ -236,18 +236,18 @@ setmetatable(_G, {
 
 -- getgenv Spy
 
-setreadonly(getgenv, false)
+--setreadonly(getgenv, false)
 
-setmetatable(getgenv(), {
-    __index = function(t, k)
-        if analyzers.GGSpy then writew("GG Spy - Invalid Index") write("Attempt to index "..k.." with a nil value inside getgenv\n\n") end return;
-    end,
-    __newindex = function(t, i, v) 
-        if analyzers.GGSpy then writew("GG Spy - New Index") write("New index was declared with the name of "..tostring(i).." and value of "..tostring(v).."\n\n") end rawset(t, i, v)
-    end
-})
+--setmetatable(getgenv(), {
+--    __index = function(t, k)
+--        if analyzers.GGSpy then writew("GG Spy - Invalid Index") write("Attempt to index "..k.." with a nil value inside getgenv\n\n") end return;
+--    end,
+--    __newindex = function(t, i, v) 
+--        if analyzers.GGSpy then writew("GG Spy - New Index") write("New index was declared with the name of "..tostring(i).." and value of "..tostring(v).."\n\n") end rawset(t, i, v)
+--    end
+--})
 
-setreadonly(getgenv, true)
+--setreadonly(getgenv, true)
 
 -- Remote Spy
 -- Decided to use hookfunction instead of the namecall metatable above
