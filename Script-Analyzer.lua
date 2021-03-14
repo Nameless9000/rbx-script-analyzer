@@ -9,6 +9,7 @@ local writew = function(...)local ar={...} rconsoleprint("@@YELLOW@@") rconsolep
 local writee = function(...)local ar={...} rconsoleprint("@@RED@@") rconsoleprint(table.concat(ar)) end
 
 rconsolename("Script Analyzer")
+rconsoleclear()
 
 writee([[
 
