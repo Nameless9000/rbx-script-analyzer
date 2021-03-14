@@ -24,6 +24,7 @@ _____) | (___| |   | | |_| || |_   | |   | | | | / ___ | | |_| |___ | ____| |
                     
 Made by CDXX/CEO of Africa#0591
 
+Edited by Nameless#9000
 
 ]])
 
@@ -76,6 +77,8 @@ local analyzers = {
     DisableWebhookReq = false
 }
 
+local request = syn.request or request or http.request
+
 addcmd({"commands", "cmds"}, function(args)
     writew([[
  All commands are followed by a second argument. The second argument is always a bool value (true or false).
@@ -86,9 +89,8 @@ addcmd({"commands", "cmds"}, function(args)
  remote - Logs all remotes that are invoked/fired by the script.
  namecall - Logs all namecalls that are invoked by the script.
  index - Logs all indexes that are invoked by the script.
- _gtable - Logs all changes made to the _G table.]],
- --getgenb - Logs all changes made to getgenv.
-[[ syntable - Logs all changes made to the syn table.
+ _gtable - Logs all changes made to the _G table.
+ syntable - Logs all changes made to the syn table.
  all - Sets the value of all analysers
     ]])
 end)
@@ -150,7 +152,6 @@ addcmd({"all"}, function(args)
 end)
 
 -------------------------------------------------------
-
 -- Gang shit below
 
 local gm = getrawmetatable(game)
@@ -235,6 +236,16 @@ setmetatable(_G, {
     end
 })
 
+setmetatable(getrenv()._G,{
+    __index = function(t, k)
+        if analyzers.GTSpy then writew("GT Spy - Invalid Index") write("Attempt to index "..k.." with a nil value inside _G\n\n") end return;
+    end,
+    __newindex = function(t,i,v)
+        if analyzers.GTSpy then writew("GT Spy - New Index") write("New index was declared with the name of "..tostring(i).." and value of "..tostring(v).."\n\n") end rawset(t, i, v)
+    end
+})
+
+setreadonly(getgenv(),false)
 -- getgenv Spy
 
 --setreadonly(getgenv, false)
