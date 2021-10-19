@@ -66,15 +66,15 @@ end
 -- Add Commands
 
 local analyzers = {
-    Http = false,
-    Remotes = false,
-    Namecalls = false,
+    Http = true,
+    Remotes = true,
+    Namecalls = true,
     Indexes = false,
-    GTSpy = false,
+    GTSpy = true,
 --    GGSpy = false,
-    SynSpy = false,
+    SynSpy = true,
     DisableHttpReq = false,
-    DisableWebhookReq = false
+    DisableWebhookReq = true
 }
 
 local request = syn.request or request or http.request
