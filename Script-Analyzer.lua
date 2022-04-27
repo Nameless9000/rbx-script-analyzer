@@ -66,15 +66,16 @@ end
 -- Add Commands
 
 local analyzers = {
-    Http = true,
-    Remotes = true,
-    Namecalls = true,
+    Http = false,
+    Websocket = false,
+    Remotes = false,
+    Namecalls = false,
     Indexes = false,
-    GTSpy = true,
+    GTSpy = false,
 --    GGSpy = false,
     SynSpy = true,
     DisableHttpReq = false,
-    DisableWebhookReq = true
+    DisableWebhookReq = false
 }
 
 local request = syn.request or request or http.request
@@ -91,6 +92,7 @@ addcmd({"commands", "cmds"}, function(args)
  index - Logs all indexes that are invoked by the script.
  _gtable - Logs all changes made to the _G table.
  syntable - Logs all changes made to the syn table.
+ websocket - Logs all websocket connections and events
  all - Sets the value of all analysers
     ]])
 end)
@@ -108,6 +110,11 @@ end)
 addcmd({"http"}, function(args)
     if args[1] == "true" then analyzers.Http = true else analyzers.Http = false end
     write("Set http analyzer to "..tostring(analyzers.Http).."\n\n")
+end)
+
+addcmd({"websocket"}, function(args)
+    if args[1] == "true" then analyzers.Websocket = true else analyzers.Websocket = false end
+    write("Set websocket analyzer to "..tostring(analyzers.Websocket).."\n\n")
 end)
 
 addcmd({"remote"}, function(args)
@@ -209,6 +216,39 @@ setmetatable(syn, {
     end
 })
 
+local oldwebsocket = syn.websocket.connect
+syn.websocket.connect = function(t)
+    local connection = oldwebsocket(t)
+    
+    if analyzers.Websocket then
+        writew("Websocket Spy - Connection")
+        write("A connection request was sent to "..tostring(t).."\n\n")
+        
+        connection.OnMessage:Connect(function(body)
+            writew("Websocket Spy - Received")
+            write("A connection request was sent to "..tostring(t).."\n")
+            write("Sending the following information: "..body.."\n\n")
+        end)
+        
+        connection.OnClose:Connect(function(body)
+            writew("Websocket Spy - Closed")
+            write("Connection closed on "..tostring(t).."\n\n")
+        end)
+        
+        local oldsend = connection.Send
+        connection.Send = function(self, message)
+            writew("Websocket Spy - Sent")
+            write("A connection request was sent to "..tostring(t).."\n")
+            write("Sending the following information: "..message.."\n\n")
+            return oldsend(self, message)
+        end
+        
+    end
+    
+    return connection
+end
+
+
 local oldrequest = syn.request
 syn.request = function(t)
     if analyzers.Http then
@@ -244,22 +284,6 @@ setmetatable(getrenv()._G,{
         if analyzers.GTSpy then writew("GT Spy - New Index") write("New index was declared with the name of "..tostring(i).." and value of "..tostring(v).."\n\n") end rawset(t, i, v)
     end
 })
-
-setreadonly(getgenv(),false)
--- getgenv Spy
-
---setreadonly(getgenv, false)
-
---setmetatable(getgenv(), {
---    __index = function(t, k)
---        if analyzers.GGSpy then writew("GG Spy - Invalid Index") write("Attempt to index "..k.." with a nil value inside getgenv\n\n") end return;
---    end,
---    __newindex = function(t, i, v) 
---        if analyzers.GGSpy then writew("GG Spy - New Index") write("New index was declared with the name of "..tostring(i).." and value of "..tostring(v).."\n\n") end rawset(t, i, v)
---    end
---})
-
---setreadonly(getgenv, true)
 
 -- Remote Spy
 -- Decided to use hookfunction instead of the namecall metatable above
