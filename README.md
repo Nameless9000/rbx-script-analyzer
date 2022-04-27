@@ -16,6 +16,8 @@ All commands are followed by a second argument. The second argument is always a 
 - index - Logs all indexes that are invoked by the script.
 - _gtable - Logs all changes made to the _G table.
 - syntable - Logs all changes made to the syn table.
+- websocket - Logs all websocket connections and events
+- all - Sets the value of all analysers
 
 Example: http true/http false
 
