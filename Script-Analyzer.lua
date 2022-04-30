@@ -1,15 +1,22 @@
--- Script Analyzer [OPEN SOURCE]
--- Made by CDXX/CEO of Africa#0591
-
 if not syn then print("Exploit not supported") return end
 
-local write = function(...)local ar={...} rconsoleprint("@@WHITE@@") rconsoleprint(table.concat(ar)) end
-local writei = function(...)local ar={...} rconsoleprint("@@BLUE@@") rconsoleprint("[*]"..table.concat(ar)) end
-local writew = function(...)local ar={...} rconsoleprint("@@YELLOW@@") rconsoleprint("[*]"..table.concat(ar).."\n") end
-local writee = function(...)local ar={...} rconsoleprint("@@RED@@") rconsoleprint(table.concat(ar)) end
+getgenv().analyzerSettings = getgenv().analyzerSettings or {
+    Http = true,
+    Websocket = true,
+    Remotes = true,
+    Namecalls = true,
+    Indexes = true,
+    GTSpy = true,
+--    GGSpy = false,
+    SynSpy = true,
+    DisableHttpReq = false,
+    DisableWebhookReq = false
+}
 
-rconsolename("Script Analyzer")
-rconsoleclear()
+local write = function(...)local ar={...} printconsole(table.concat(ar),255,255,255) end
+local writei = function(...)local ar={...} printconsole("[*]"..table.concat(ar),0,0,255) end
+local writew = function(...)local ar={...} printconsole("[*]"..table.concat(ar).."\n",255, 255, 0) end
+local writee = function(...)local ar={...} printconsole(table.concat(ar),255,0,0) end
 
 writee([[
 
@@ -22,141 +29,16 @@ _____) | (___| |   | | |_| || |_   | |   | | | | / ___ | | |_| |___ | ____| |
                     |_|                              (____/                  
                         
                     
-Made by CDXX/CEO of Africa#0591
+Originally made by CDXX/CEO of Africa#0591
 
-Edited by Nameless#9000
+Heavily moddified by Nameless#9000
 
 ]])
 
--------------------------------------------------------
 
--- Command Handling
-
-local commands = {}
-local function addcmd(aliases, func)
-    assert(type(aliases) == "table", "Invalid arg 1 supplied")
-    assert(type(func) == "function", "Invalid arg 2 supplied")
-    commands[aliases] = func
-end
-
-local function handlerequest(request)
-    request = request:lower():split(" ")
-    for i,v in pairs(commands) do
-        if table.find(i, request[1]) then
-            pcall(function() 
-                v((function()
-                    local t = {}
-                    for ii,__ in pairs(request) do
-                        if ii ~= 1 then table.insert(t, 1, request[ii]) end
-                    end
-                    return t;
-                end)()) 
-            end)
-            write("\n")
-            break;
-        end
-    end
-    rconsoleprint("@@WHITE@@")
-    local input = rconsoleinput()
-    handlerequest(input)
-end
-
--------------------------------------------------------
-
--- Add Commands
-
-local analyzers = {
-    Http = false,
-    Websocket = false,
-    Remotes = false,
-    Namecalls = false,
-    Indexes = false,
-    GTSpy = false,
---    GGSpy = false,
-    SynSpy = true,
-    DisableHttpReq = false,
-    DisableWebhookReq = false
-}
+local analyzers = getgenv().analyzerSettings
 
 local request = syn.request or request or http.request
-
-addcmd({"commands", "cmds"}, function(args)
-    writew([[
- All commands are followed by a second argument. The second argument is always a bool value (true or false).
-
- disablehttpreq - Blocks http requests. Usefull for analyzing malicious scripts without consequences.
- disablewebhook - Blocks all http requests that involve discord webhooks.
- http - Analyze http requests made by the script. This will also log syn.requests.
- remote - Logs all remotes that are invoked/fired by the script.
- namecall - Logs all namecalls that are invoked by the script.
- index - Logs all indexes that are invoked by the script.
- _gtable - Logs all changes made to the _G table.
- syntable - Logs all changes made to the syn table.
- websocket - Logs all websocket connections and events
- all - Sets the value of all analysers
-    ]])
-end)
-
-addcmd({"disablewebhook"}, function(args)
-    if args[1] == "true" then analyzers.DisableWebhookReq = true else analyzers.DisableWebhookReq = false end
-    write("Set webhook disabler to "..tostring(analyzers.DisableWebhookReq).."\n\n")
-end)
-
-addcmd({"disablehttpreq", "disablehttp"}, function(args)
-    if args[1] == "true" then analyzers.DisableHttpReq = true else analyzers.DisableHttpReq = false end
-    write("Set http request disabler to "..tostring(analyzers.DisableHttpReq).."\n\n")
-end)
-
-addcmd({"http"}, function(args)
-    if args[1] == "true" then analyzers.Http = true else analyzers.Http = false end
-    write("Set http analyzer to "..tostring(analyzers.Http).."\n\n")
-end)
-
-addcmd({"websocket"}, function(args)
-    if args[1] == "true" then analyzers.Websocket = true else analyzers.Websocket = false end
-    write("Set websocket analyzer to "..tostring(analyzers.Websocket).."\n\n")
-end)
-
-addcmd({"remote"}, function(args)
-    if args[1] == "true" then analyzers.Remotes = true else analyzers.Remotes = false end
-    write("Set remote analyzer to "..tostring(analyzers.Remotes).."\n\n")
-end)
-
-addcmd({"namecall"}, function(args)
-    if args[1] == "true" then analyzers.Namecalls = true else analyzers.Namecalls = false end
-    write("Set namecall analyzer to "..tostring(analyzers.Namecalls).."\n\n")
-end)
-
-addcmd({"index"}, function(args)
-    if args[1] == "true" then analyzers.Indexes = true else analyzers.Indexes = false end
-    write("Set index analyzer to "..tostring(analyzers.Indexes).."\n\n")
-end)
-
-addcmd({"_gtable"}, function(args)
-    if args[1] == "true" then analyzers.GTSpy = true else analyzers.GTSpy = false end
-    write("Set _G table analyzer to "..tostring(analyzers.GTSpy).."\n\n")
-end)
-
---addcmd({"getgenv"}, function(args)
---    if args[1] == "true" then analyzers.GGSpy = true else analyzers.GGSpy = false end
---    write("Set getgenv analyzer to "..tostring(analyzers.GGSpy).."\n\n")
---end)
-
-addcmd({"syntable"}, function(args)
-    if args[1] == "true" then analyzers.SynSpy = true else analyzers.SynSpy = false end
-    write("Set syn table analyzer to "..tostring(analyzers.SynSpy).."\n\n")
-end)
-
-addcmd({"all"}, function(args)
-    for Name,_ in pairs(analyzers) do
-        if args[1] == "true" then
-            analyzers[Name] = true
-        else
-            analyzers[Name] = false
-        end
-        write("Set syn table analyzer to "..tostring(Name).."\n\n")
-    end
-end)
 
 -------------------------------------------------------
 -- Gang shit below
@@ -297,9 +179,5 @@ end), hookfunction(Instance.new("RemoteEvent").FireServer, function(self, ...)
     return oldfire(self, ...)
 end)
 
--------------------------------------------------------
 
--- Initialize
-
-writei("Thank you for using Script Analyzer. Type commands to begin.\n")
-handlerequest("")
+writei("Script Analyzer started.\n")
