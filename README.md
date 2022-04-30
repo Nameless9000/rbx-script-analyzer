@@ -22,6 +22,4 @@ getgenv().analyzerSettings = {
 
 3. Execute scripts you want to analyze
 
-![](./Images/1.PNG)
-![](./Images/2.PNG)
-![](./Images/3.PNG)
+4. Press insert (internal ui needs to be enabled)
