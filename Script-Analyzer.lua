@@ -1,7 +1,9 @@
 if not syn then print("Exploit not supported") return end
+local HttpService = game:GetService("HttpService")
 
 getgenv().analyzerSettings = getgenv().analyzerSettings or {
     Http = true,
+    HttpDump = false, -- dumps the full args list
     Websocket = true,
     Remotes = true,
     Namecalls = true,
@@ -98,7 +100,10 @@ setmetatable(syn, {
     end
 })
 
+setreadonly(syn.websocket,false)
+
 local oldwebsocket = syn.websocket.connect
+
 syn.websocket.connect = function(t)
     local connection = oldwebsocket(t)
     
@@ -117,6 +122,8 @@ syn.websocket.connect = function(t)
             write("Connection closed on "..tostring(t).."\n\n")
         end)
         
+        setreadonly(connection,false)
+        
         local oldsend = connection.Send
         connection.Send = function(self, message)
             writew("Websocket Spy - Sent")
@@ -130,7 +137,6 @@ syn.websocket.connect = function(t)
     return connection
 end
 
-
 local oldrequest = syn.request
 syn.request = function(t)
     if analyzers.Http then
@@ -140,6 +146,9 @@ syn.request = function(t)
             write("Sending the following information: "..t.Body.."\n\n")
         else
             write("A "..tostring(t.Method).." request was sent to "..tostring(t.Url).."\n\n")
+        end
+        if HttpDump then
+            write("Args Dump:\n"..HttpService:JSONEncode(t).."\n\n")
         end
     end
     if analyzers.DisableHttpReq then writee("Blocked HTTP Request") return end
