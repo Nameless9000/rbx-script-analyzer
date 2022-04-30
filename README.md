@@ -3,7 +3,7 @@ Analyze roblox exploiting scripts and reverse engineer them. Usefull if you are 
 
 Instructions:
 
-1 (optional) Edit the analyzer settings first
+1. (optional) Edit the analyzer settings first
 ```lua
 getgenv().analyzerSettings = {
     Http = true,
