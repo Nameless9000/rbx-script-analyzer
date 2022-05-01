@@ -3,22 +3,61 @@ local HttpService = game:GetService("HttpService")
 
 getgenv().analyzerSettings = getgenv().analyzerSettings or {
     Http = true,
-    HttpDump = false, -- dumps the full args list
+    HttpDump = true, -- dumps the full args list
     Websocket = true,
     Remotes = true,
     Namecalls = true,
     Indexes = true,
     GTSpy = true,
+    LogData = true,
 --    GGSpy = false,
     SynSpy = true,
     DisableHttpReq = false,
     DisableWebhookReq = false
 }
 
-local write = function(...)local ar={...} printconsole(table.concat(ar),255,255,255) end
-local writei = function(...)local ar={...} printconsole("[*]"..table.concat(ar),0,0,255) end
-local writew = function(...)local ar={...} printconsole("[*]"..table.concat(ar).."\n",255, 255, 0) end
-local writee = function(...)local ar={...} printconsole(table.concat(ar),255,0,0) end
+local analyzers = getgenv().analyzerSettings
+
+
+local fileName
+
+function LogData(...)
+    if not analyzers.LogData then return end
+    
+    if not isfolder("ScriptAnalyzer") then
+        makefolder("ScriptAnalyzer")
+    end
+    
+    local startTick = math.floor(tick())
+    if not fileName then
+        fileName = "ScriptAnalyzer/"..startTick.."-Log.txt"
+        writefile(fileName,"## Game: "..game.PlaceId.." | Server: "..game.JobId.." | Time: "..startTick.." ##\n\n")
+    end
+    
+    local ar={...}
+    appendfile(fileName, table.concat(ar).."\n")
+end
+
+local write = function(...)
+    local ar={...}
+    printconsole(table.concat(ar),255,255,255)
+    LogData(table.concat(ar))
+end
+local writei = function(...)
+    local ar={...}
+    printconsole("[*] "..table.concat(ar),0,0,255)
+    LogData("[*] "..table.concat(ar))
+end
+local writew = function(...)
+    local ar={...}
+    printconsole("[*] "..table.concat(ar).."\n",255, 255, 0)
+    LogData("[*] "..table.concat(ar).."\n")
+end
+local writee = function(...)
+    local ar={...}
+    printconsole(table.concat(ar),255,0,0)
+    LogData(table.concat(ar))
+end
 
 writee([[
 
@@ -37,8 +76,6 @@ Heavily moddified by Nameless#9000
 
 ]])
 
-
-local analyzers = getgenv().analyzerSettings
 
 local request = syn.request or request or http.request
 
@@ -136,6 +173,7 @@ syn.websocket.connect = function(t)
     
     return connection
 end
+
 
 local oldrequest = syn.request
 syn.request = function(t)
